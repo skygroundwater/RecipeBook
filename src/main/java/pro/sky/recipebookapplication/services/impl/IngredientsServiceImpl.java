@@ -53,9 +53,6 @@ public class IngredientsServiceImpl implements IngredientsService {
     }
 
     public Map<Long, Ingredient> getAllIngredients() {
-        for (long i = 0; i < listIngredients.size(); ) {
-            listIngredients.get(++i);
-        }
         return listIngredients;
     }
 }

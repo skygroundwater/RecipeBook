@@ -11,25 +11,16 @@ import pro.sky.recipebookapplication.services.RecipeBookService;
 @Service
 public class RecipeBookServiceImpl implements RecipeBookService {
 
-    public static long id = 1;
+    private static long id = 1;
     private final Map<Long, Recipe> listRecipes = new TreeMap<>();
 
     @Override
     public Recipe getRecipe(long id) {
-        for (Entry<Long, Recipe> entry : listRecipes.entrySet()) {
-            if (entry != null && entry.getKey() == id) {
-                Recipe recipe = listRecipes.get(id);
-                if (recipe != null) {
-                    return recipe;
-                }
-            }
-        }
-        return null;
+        return listRecipes.get(id);
     }
 
     @Override
     public long addRecipe(Recipe recipe) {
-        listRecipes.getOrDefault(id, null);
         listRecipes.put(id, recipe);
         return id++;
     }
@@ -54,9 +45,6 @@ public class RecipeBookServiceImpl implements RecipeBookService {
 
     @Override
     public Map<Long, Recipe> getAllRecipes() {
-        for (long i = 0; i < listRecipes.size(); ) {
-            listRecipes.get(++i);
-        }
         return listRecipes;
     }
 }
