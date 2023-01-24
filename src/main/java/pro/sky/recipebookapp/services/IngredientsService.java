@@ -1,7 +1,8 @@
 package pro.sky.recipebookapp.services;
 
-import java.util.Map;
 import pro.sky.recipebookapp.models.ingredients.Ingredient;
+
+import java.util.Map;
 
 
 public interface IngredientsService {
