@@ -1,4 +1,4 @@
-package com.recipebook;
+package pro.sky.recipebookapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
