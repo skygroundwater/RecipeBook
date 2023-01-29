@@ -3,11 +3,12 @@ package pro.sky.recipebookapp.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import pro.sky.recipebookapp.models.Recipe;
 import pro.sky.recipebookapp.services.RecipeBookService;
-import pro.sky.recipebookapp.services.fileservices.RecipesFileService;
+import pro.sky.recipebookapp.services.fileservices.FileService;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -17,12 +18,12 @@ import java.util.TreeMap;
 @Service
 public class RecipeBookServiceImpl implements RecipeBookService {
 
-    private final RecipesFileService recipeFileService;
+    private final FileService fileService;
     public static long id = 1;
     private Map<Long, Recipe> listRecipes = new TreeMap<>();
 
-    public RecipeBookServiceImpl(RecipesFileService recipeFileService) {
-        this.recipeFileService = recipeFileService;
+    public RecipeBookServiceImpl(@Qualifier("recipesFileServiceImpl") FileService fileService) {
+        this.fileService = fileService;
     }
 
     @PostConstruct
@@ -63,7 +64,7 @@ public class RecipeBookServiceImpl implements RecipeBookService {
     private void saveToFile(){
         try {
             String json = new ObjectMapper().writeValueAsString(listRecipes);
-            recipeFileService.saveToFile(json);
+            fileService.saveToFile(json);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +72,7 @@ public class RecipeBookServiceImpl implements RecipeBookService {
 
     private void readFromFile(){
 
-        String json = recipeFileService.readFromFile();
+        String json = fileService.readFromFile();
         try {
             listRecipes = new ObjectMapper().readValue(json, new TypeReference<TreeMap<Long, Recipe>>(){});
         } catch (JsonProcessingException e) {
