@@ -3,9 +3,7 @@ package pro.sky.recipebookapp.services.fileservices.impl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pro.sky.recipebookapp.services.fileservices.FileService;
-
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -22,16 +20,15 @@ public class RecipesFileServiceImpl implements FileService {
     public File getDataFile(){
         return new File(dataFilePath + "/" + dataFileName);
     }
-
     @Override
     public void saveToFile(String json){
         try {
             cleanDataFile();
             Files.writeString(Path.of(dataFilePath, dataFileName), json);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
+            throw new RuntimeException();
         }
     }
-
     @Override
     public  String readFromFile(){
         try {
@@ -40,7 +37,6 @@ public class RecipesFileServiceImpl implements FileService {
             throw new RuntimeException(e);
         }
     }
-
     @Override
     public void cleanDataFile() {
         try {
@@ -49,6 +45,15 @@ public class RecipesFileServiceImpl implements FileService {
             Files.createFile(path);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Path createTempFile(String suffix) {
+        try{
+            return Files.createTempFile(Path.of(dataFilePath), "temp", suffix);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
