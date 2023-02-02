@@ -85,8 +85,8 @@ public class RecipeBookServiceImpl implements RecipeBookService {
     }
 
  @Override
-    public Path getTextFile(String recipeName) {
-        Path file = fileService.createTempFile(recipeName);
+    public Path getTextFile(String fileName) {
+        Path file = fileService.createTempFile(fileName);
         try(Writer writer = Files.newBufferedWriter(file, StandardOpenOption.APPEND)) {
             for (Map.Entry<Long, Recipe> recipe : getAllRecipes().entrySet()) {
                 writer.append(recipe.getValue().getTitle())

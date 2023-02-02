@@ -74,19 +74,19 @@ public class RecipeBookController {
         }
     }
     @GetMapping("/createTextFile")
-    public ResponseEntity<Object> createTempTextFileWithRecipes(@RequestParam String recipeName){
+    public ResponseEntity<Object> createTempTextFileWithRecipes(@RequestParam String fileName){
         try {
-            if (recipeService.getTextFile(recipeName) == null) {
+            if (recipeService.getTextFile(fileName) == null) {
                 return ResponseEntity.notFound().build();
             }
-            Path path = recipeService.getTextFile(recipeName);
+            Path path = recipeService.getTextFile(fileName);
             if (Files.size(path) == 0) {
                 return ResponseEntity.noContent().build();
             }
             InputStreamResource resource = new InputStreamResource(new FileInputStream(path.toFile()));
             return ResponseEntity.ok()
                     .contentType(MediaType.TEXT_PLAIN)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"report.txt\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"recipesText.txt\"")
                     .contentLength(Files.size(path))
                     .body(resource);
         } catch (FileNotFoundException e) {
