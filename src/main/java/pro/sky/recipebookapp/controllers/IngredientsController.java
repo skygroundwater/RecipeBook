@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/ingredients")
 public class IngredientsController {
 
-    private IngredientsService ingredientsService;
+    private final IngredientsService ingredientsService;
 
     public IngredientsController(IngredientsService ingredientsService) {
         this.ingredientsService = ingredientsService;

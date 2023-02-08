@@ -6,8 +6,10 @@ import pro.sky.recipebookapp.services.fileservices.FileService;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 
 
 @Service
@@ -29,10 +31,10 @@ public class IngredientsFileServiceImpl implements FileService {
         try {
             cleanDataFile();
             Files.writeString(Path.of(dataFilePath, dataFileName), json);
-        } catch (IOException e) {
+        } catch (IOException ignored) {
+
         }
     }
-
     @Override
     public  String readFromFile(){
         try {
@@ -52,4 +54,10 @@ public class IngredientsFileServiceImpl implements FileService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public Path createTempFile(String suffix) {
+        return null;
+    }
+
 }

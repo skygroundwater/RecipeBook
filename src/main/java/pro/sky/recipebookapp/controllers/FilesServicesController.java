@@ -1,5 +1,7 @@
 package pro.sky.recipebookapp.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -8,10 +10,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pro.sky.recipebookapp.models.Recipe;
 import pro.sky.recipebookapp.services.fileservices.impl.IngredientsFileServiceImpl;
 import pro.sky.recipebookapp.services.fileservices.impl.RecipesFileServiceImpl;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 @RestController
 @RequestMapping("/files")
@@ -34,17 +40,19 @@ public class FilesServicesController {
     }
 
     @GetMapping("/exportrecipes")
-    public ResponseEntity<InputStreamResource> downloadIngredientsDataFile() throws FileNotFoundException {
+    public ResponseEntity<InputStreamResource> downloadRecipesDataFile() throws FileNotFoundException {
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
                     .contentLength(recipesFileService.getDataFile().length()).header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"RecipesLog.json\"").body(getInputStreamFromFileOfService(recipesFileService.getDataFile()));
+                            "attachment; filename=\"RecipesLog.txt\"").body(getInputStreamFromFileOfService(recipesFileService.getDataFile()));
     }
+
     @GetMapping("/exportingredients")
-    public ResponseEntity<InputStreamResource> downloadRecipesDataFile() throws FileNotFoundException {
+    public ResponseEntity<InputStreamResource> downloadIngredientsDataFile() throws FileNotFoundException {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON)
                 .contentLength(ingredientsFileService.getDataFile().length()).header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; fileName = \"IngredientsLog.json\"").body(getInputStreamFromFileOfService(ingredientsFileService.getDataFile()));
     }
+
 
     private ResponseEntity<Void> uploadDataFile(String value, MultipartFile multipartFile){
         File dataFile = null;
