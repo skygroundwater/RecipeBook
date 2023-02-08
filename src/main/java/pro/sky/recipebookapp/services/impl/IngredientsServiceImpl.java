@@ -3,26 +3,26 @@ package pro.sky.recipebookapp.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import pro.sky.recipebookapp.models.ingredients.Ingredient;
 import pro.sky.recipebookapp.services.IngredientsService;
-import pro.sky.recipebookapp.services.fileservices.IngredientsFileService;
+import pro.sky.recipebookapp.services.fileservices.FileService;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.TreeMap;
 
-
 @Service
 public class IngredientsServiceImpl implements IngredientsService {
 
-    private final IngredientsFileService ingredientsFileService;
+    private final FileService fileService;
     private static long id = 1;
     private Map<Long, Ingredient> listIngredients = new TreeMap<>();
 
-    public IngredientsServiceImpl(IngredientsFileService ingredientsFileService) {
-        this.ingredientsFileService = ingredientsFileService;
+    public IngredientsServiceImpl(@Qualifier("ingredientsFileServiceImpl") FileService fileService) {
+        this.fileService = fileService;
     }
 
     @PostConstruct
@@ -63,7 +63,7 @@ public class IngredientsServiceImpl implements IngredientsService {
     private void saveToFile(){
         try {
             String json = new ObjectMapper().writeValueAsString(listIngredients);
-            ingredientsFileService.saveToFile(json);
+            fileService.saveToFile(json);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +71,7 @@ public class IngredientsServiceImpl implements IngredientsService {
 
     private void readFromFile(){
 
-        String json = ingredientsFileService.readFromFile();
+        String json = fileService.readFromFile();
         try {
             listIngredients = new ObjectMapper().readValue(json, new TypeReference<TreeMap<Long, Ingredient>>(){});
         } catch (JsonProcessingException e) {
