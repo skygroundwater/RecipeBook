@@ -1,36 +1,44 @@
 package pro.sky.recipebookapp.services.impl;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+
 import pro.sky.recipebookapp.models.Recipe;
 import pro.sky.recipebookapp.services.RecipeBookService;
+import pro.sky.recipebookapp.services.fileservices.RecipesFileService;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 @Service
 public class RecipeBookServiceImpl implements RecipeBookService {
 
+    private final RecipesFileService recipeFileService;
     public static long id = 1;
-    private final Map<Long, Recipe> listRecipes = new TreeMap<>();
+    private Map<Long, Recipe> listRecipes = new TreeMap<>();
+
+    public RecipeBookServiceImpl(RecipesFileService recipeFileService) {
+        this.recipeFileService = recipeFileService;
+    }
+
+    @PostConstruct
+    private void init(){
+        readFromFile();
+    }
 
     @Override
     public Recipe getRecipe(long id) {
-        for (Entry<Long, Recipe> entry : listRecipes.entrySet()) {
-            if (entry != null && entry.getKey() == id) {
-                Recipe recipe = listRecipes.get(id);
-                if (recipe != null) {
-                    return recipe;
-                }
-            }
-        }
-        return null;
+        return listRecipes.get(id);
     }
 
     @Override
     public long addRecipe(Recipe recipe) {
-        listRecipes.getOrDefault(id, null);
         listRecipes.put(id, recipe);
+        saveToFile();
         return id++;
     }
 
@@ -52,11 +60,27 @@ public class RecipeBookServiceImpl implements RecipeBookService {
         return false;
     }
 
+    private void saveToFile(){
+        try {
+            String json = new ObjectMapper().writeValueAsString(listRecipes);
+            recipeFileService.saveToFile(json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void readFromFile(){
+
+        String json = recipeFileService.readFromFile();
+        try {
+            listRecipes = new ObjectMapper().readValue(json, new TypeReference<TreeMap<Long, Recipe>>(){});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public Map<Long, Recipe> getAllRecipes() {
-        for (long i = 0; i < listRecipes.size(); ) {
-            listRecipes.get(++i);
-        }
         return listRecipes;
     }
 }

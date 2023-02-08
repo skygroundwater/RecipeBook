@@ -1,29 +1,38 @@
 package pro.sky.recipebookapp.services.impl;
 
-import java.util.Map;
-import java.util.TreeMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+
 import pro.sky.recipebookapp.models.ingredients.Ingredient;
 import pro.sky.recipebookapp.services.IngredientsService;
+import pro.sky.recipebookapp.services.fileservices.IngredientsFileService;
+
+import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 @Service
 public class IngredientsServiceImpl implements IngredientsService {
 
-    public static long id = 1;
-    private final Map<Long, Ingredient> listIngredients = new TreeMap<>();
+    private final IngredientsFileService ingredientsFileService;
+    private static long id = 1;
+    private Map<Long, Ingredient> listIngredients = new TreeMap<>();
+
+    public IngredientsServiceImpl(IngredientsFileService ingredientsFileService) {
+        this.ingredientsFileService = ingredientsFileService;
+    }
+
+    @PostConstruct
+    private void init(){
+        readFromFile();
+    }
 
     @Override
     public Ingredient getIngredients(long id) {
-        for (Map.Entry<Long, Ingredient> entry : listIngredients.entrySet()) {
-            if (entry != null && entry.getKey() == id) {
-                Ingredient ingredients = listIngredients.get(id);
-                if (ingredients != null) {
-                    return ingredients;
-                }
-            }
-        }
-        return null;
+        return listIngredients.get(id);
     }
 
     @Override
@@ -37,8 +46,8 @@ public class IngredientsServiceImpl implements IngredientsService {
 
     @Override
     public long addIngredients(Ingredient ingredients) {
-        listIngredients.getOrDefault(id, null);
         listIngredients.put(id, ingredients);
+        saveToFile();
         return id++;
     }
 
@@ -51,11 +60,26 @@ public class IngredientsServiceImpl implements IngredientsService {
         }
         return false;
     }
+    private void saveToFile(){
+        try {
+            String json = new ObjectMapper().writeValueAsString(listIngredients);
+            ingredientsFileService.saveToFile(json);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void readFromFile(){
+
+        String json = ingredientsFileService.readFromFile();
+        try {
+            listIngredients = new ObjectMapper().readValue(json, new TypeReference<TreeMap<Long, Ingredient>>(){});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public Map<Long, Ingredient> getAllIngredients() {
-        for (long i = 0; i < listIngredients.size(); ) {
-            listIngredients.get(++i);
-        }
         return listIngredients;
     }
 }
